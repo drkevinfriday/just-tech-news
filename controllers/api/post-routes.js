@@ -93,33 +93,19 @@ router.post('/', (req, res) => {
 // put /api/posts/upvote
 router.put('/upvote', (req,res)=>{
 
-// Vote.create({
-//   user_id: req.body.user_id,
-//   post_id: req.body.post_id
-// }).then(()=>{
-//   //then find the post we just voted on 
-//   return Post.findOne({
-//     where: {
-//       id: req.body.post_id
-//     },
-//     attributes:[
-//       'id',
-//       'post_url',
-//       'title',
-//       'created_at',
-//       // use the raw sql aggerate function to count the number of votes the post has as vote_count
-//       [
-//         sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),'vote_count'
-//       ]
-//     ]
-//   })
-// })
-Post.upvote(req.body,{Vote})
-.then(dbPostData => res.json(dbPostData))
+
+
+//make sure the session exists first
+if(req.session){
+
+
+Post.upvote({...req.body, user_id:req.session.user_id},{Vote,Comment, User})
+.then(updatedVoteData  => res.json(updatedVoteData ))
 .catch(err => {
     console.log(err);
-    res.status(400).json(err);
+    res.status(500).json(err);
   });
+}
 })
 
 router.put('/:id', (req, res) => {
